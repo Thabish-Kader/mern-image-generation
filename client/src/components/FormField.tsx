@@ -6,7 +6,7 @@ type FormFieldProps = {
 	name: string;
 	placeholder: string;
 	value: string;
-	handleChange: () => void;
+	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	isSurpriseMe?: boolean;
 	handleSurpriseMe?: () => void;
 };
