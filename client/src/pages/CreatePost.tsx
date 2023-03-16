@@ -3,18 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { FormField } from "../components/FormField";
 import preview from "../assets/preview.png";
 import { Loader } from "../components/Loader";
+import { getSearchParamsForLocation } from "react-router-dom/dist/dom";
+import { getRandomPrompt } from "../utils/getRandomPrompt";
+import { surpriseMePrompts } from "../constants";
 
 const CreatePost = () => {
 	const navigate = useNavigate();
-	const [form, setForm] = useState({ name: "", prompt: "", photo: "" });
+	const [form, setForm] = useState({
+		name: "",
+		prompt: "Marcus Arelius in a boxing ring ?",
+		photo: "",
+	});
 	const [generatingImg, setGeneratingImg] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = () => {};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setForm({ ...form, [e.target.name]: e.target.value });
+	};
 
-	const handleSurpriseMe = () => {};
+	const handleSurpriseMe = () => {
+		const randomPrompt = getRandomPrompt(form.prompt);
+		setForm({ ...form, prompt: randomPrompt });
+	};
 
 	const generateImage = () => {};
 
@@ -44,7 +56,7 @@ const CreatePost = () => {
 						labelName="Prompt"
 						type="text"
 						name="prompt"
-						placeholder="Marcus Arelius in a boxing ring"
+						placeholder={form.prompt}
 						value={form.name}
 						handleChange={handleChange}
 						isSurpriseMe
