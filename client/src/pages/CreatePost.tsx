@@ -56,7 +56,6 @@ const CreatePost = () => {
 		}
 	};
 
-	// const generateImage = async () => {
 	// 	if (form.prompt) {
 	// 		try {
 	// 			setGeneratingImg(true);
