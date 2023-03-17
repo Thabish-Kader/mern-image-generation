@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FormField } from "../components/FormField";
 import preview from "../assets/preview.png";
 import { Loader } from "../components/Loader";
-import { getSearchParamsForLocation } from "react-router-dom/dist/dom";
+import axios from "axios";
 import { getRandomPrompt } from "../utils/getRandomPrompt";
-import { surpriseMePrompts } from "../constants";
 
 const CreatePost = () => {
 	const navigate = useNavigate();
@@ -28,7 +27,64 @@ const CreatePost = () => {
 		setForm({ ...form, prompt: randomPrompt });
 	};
 
-	const generateImage = () => {};
+	const generateImage = async () => {
+		if (form.prompt) {
+			try {
+				setGeneratingImg(true);
+				const response = await axios.post(
+					"http://localhost:8080/api/v1/dalle",
+					{
+						prompt: form.prompt,
+					},
+					{
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+				const data = await response.data;
+
+				setForm({
+					...form,
+					photo: `data:image/jpeg;base64,${data.photo}`,
+				});
+			} catch (error) {
+				alert(error);
+			} finally {
+				setGeneratingImg(false);
+			}
+		} else {
+			alert("Please enter a prompt");
+		}
+	};
+
+	// const generateImage = async () => {
+	// 	if (form.prompt) {
+	// 		try {
+	// 			setGeneratingImg(true);
+	// 			const response = await fetch(
+	// 				"http://localhost:8080/api/v1/dalle",
+	// 				{
+	// 					method: "POST",
+	// 					headers: {
+	// 						"Content-Type": "application/json",
+	// 					},
+	// 					body: JSON.stringify({ prompt: form.prompt }),
+	// 				}
+	// 			);
+	// 			const data = await response.json();
+	// 			console.log(data);
+	// 			setForm({
+	// 				...form,
+	// 				photo: `data:image/jpeg;base64,${data.photo}`,
+	// 			});
+	// 		} catch (error) {
+	// 			alert(error);
+	// 		} finally {
+	// 			setGeneratingImg(false);
+	// 		}
+	// 	} else {
+	// 		alert("Please enter a prompt");
+	// 	}
+	// };
 
 	return (
 		<section className="max-w-7xl mx-auto">
@@ -57,7 +113,7 @@ const CreatePost = () => {
 						type="text"
 						name="prompt"
 						placeholder={form.prompt}
-						value={form.name}
+						value={form.prompt}
 						handleChange={handleChange}
 						isSurpriseMe
 						handleSurpriseMe={handleSurpriseMe}
