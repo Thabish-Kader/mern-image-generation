@@ -2,16 +2,17 @@ import { useState, useEffect } from "react";
 import { Loader } from "../components/Loader";
 import axios from "axios";
 import { Card } from "../components/Card";
+import { FormField } from "../components/FormField";
 
-type TPost = {
-	name: string;
-	photo: string;
-	prompt: string;
-};
-
-const RenderCards = ({ data, title }: { data: []; title: string }) => {
-	if (data?.length > 0) {
-		return data.map((post) => <Card key={post._id} {...post} />);
+const RenderCards = ({ data, title }: { data?: TPost[]; title: string }) => {
+	if (data?.length! > 0) {
+		return (
+			<>
+				{data?.map((post) => (
+					<Card key={post._id} {...post} />
+				))}
+			</>
+		);
 	}
 
 	return (
@@ -23,8 +24,10 @@ const RenderCards = ({ data, title }: { data: []; title: string }) => {
 
 const Home = () => {
 	const [loading, setLoading] = useState(false);
-	const [allPost, setAllPost] = useState<TPost[] | null>();
+	const [allPost, setAllPost] = useState<TPost[]>();
 	const [searchText, setSearchText] = useState("");
+	const [searchedResults, setSearchedResults] = useState();
+	const [searchTimeOut, setSearchTimeOut] = useState<number>();
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -47,6 +50,26 @@ const Home = () => {
 		};
 		fetchPosts();
 	}, []);
+
+	const handleSearchChange = (e: any) => {
+		clearTimeout(searchTimeOut);
+		setSearchText(e.target.value);
+		setSearchTimeOut(
+			setTimeout(() => {
+				const searchResults = allPost?.filter(
+					(item) =>
+						item.name
+							.toLowerCase()
+							.includes(searchText.toLowerCase()) ||
+						item.prompt
+							.toLowerCase()
+							.includes(searchText.toLowerCase())
+				);
+				setSearchedResults(searchedResults);
+			}, 500)
+		);
+	};
+
 	return (
 		<section className="max-w-7xl mx-auto ">
 			<div>
@@ -58,7 +81,16 @@ const Home = () => {
 					world with your mind
 				</p>
 
-				<div className="mt-16">{/* <FormField/> */}</div>
+				<div className="mt-16">
+					<FormField
+						labelName="Search posts"
+						type="text"
+						name="text"
+						placeholder="Search posts"
+						value={searchText}
+						handleChange={handleSearchChange}
+					/>
+				</div>
 
 				<div className="mt-10">
 					{loading ? (
@@ -78,7 +110,7 @@ const Home = () => {
 							<div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3 ">
 								{searchText ? (
 									<RenderCards
-										data={allPost}
+										data={searchedResults}
 										title="No search results found"
 									/>
 								) : (
