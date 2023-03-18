@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
 import { Loader } from "../components/Loader";
+import axios from "axios";
+import { Card } from "../components/Card";
+
+type TPost = {
+	name: string;
+	photo: string;
+	prompt: string;
+};
 
 const RenderCards = ({ data, title }: { data: []; title: string }) => {
 	if (data?.length > 0) {
@@ -15,8 +23,30 @@ const RenderCards = ({ data, title }: { data: []; title: string }) => {
 
 const Home = () => {
 	const [loading, setLoading] = useState(false);
-	const [allPost, setAllPost] = useState(null);
+	const [allPost, setAllPost] = useState<TPost[] | null>();
 	const [searchText, setSearchText] = useState("");
+
+	useEffect(() => {
+		const fetchPosts = async () => {
+			setLoading(true);
+			try {
+				const response = await axios.get(
+					"http://localhost:8080/api/v1/post",
+					{
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+				if (response.status === 200) {
+					setAllPost(response.data);
+				}
+			} catch (error) {
+				alert(error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchPosts();
+	}, []);
 	return (
 		<section className="max-w-7xl mx-auto ">
 			<div>
@@ -48,13 +78,13 @@ const Home = () => {
 							<div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3 ">
 								{searchText ? (
 									<RenderCards
-										data={[]}
+										data={allPost}
 										title="No search results found"
 									/>
 								) : (
 									<>
 										<RenderCards
-											data={[]}
+											data={allPost}
 											title="No posts found"
 										/>
 									</>

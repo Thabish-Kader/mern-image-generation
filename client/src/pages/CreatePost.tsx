@@ -16,7 +16,31 @@ const CreatePost = () => {
 	const [generatingImg, setGeneratingImg] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = () => {};
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		if (form.prompt && form.photo) {
+			setLoading(true);
+
+			try {
+				const response = await axios.post(
+					"http://localhost:8080/api/v1/dalle",
+					{
+						form,
+					},
+					{
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+				console.log(response);
+				navigate("/");
+			} catch (error) {
+				alert(error);
+			} finally {
+				setLoading(false);
+			}
+		} else {
+			alert("Please enterdetails ");
+		}
+	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form, [e.target.name]: e.target.value });
