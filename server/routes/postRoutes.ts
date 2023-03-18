@@ -36,15 +36,8 @@ router.get("/", async (req, res) => {
 		const posts = await Post.find({});
 		res.status(200).json({ success: true, data: posts });
 	} catch (error) {
-		res.status(500).json({ success: false, data: error });
+		res.status(500).json({ success: false, message: error });
 	}
-
-	const url = cloudinary.url("olympic_flag", {
-		width: 100,
-		height: 150,
-		Crop: "fill",
-	});
-	res.status(200).send(`Retrieval successful ---> ${url}`);
 });
 
 export default router;
